@@ -1,0 +1,62 @@
+# -------------------------
+# Python
+# -------------------------
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.log
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# -------------------------
+# Project-specific
+# -------------------------
+
+# Environment Variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Local database files (if any)
+*.db
+*.sqlite
+
+# Cache & temp files
+.cache/
+.tmp/
+.temp/
+*.tmp
+*.swp
+
+# VSCode / Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python build
+build/
+dist/
+*.tar.gz
+*.whl
+
+# Reports / Output
+output/
+reports/

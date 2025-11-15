@@ -1,74 +1,218 @@
+# CoinGecko Cryptocurrency ETL Pipeline
 
-# 🧠 ETL Project: CoinGecko Cryptocurrency Data Pipeline
+A fully modular, production-ready ETL (Extract, Transform, Load) pipeline that pulls cryptocurrency data from the **CoinGecko API**, transforms it with **pandas**, loads it into **PostgreSQL**, and sends an automated **HTML email report** with an attached in-memory CSV file.
 
-### 📋 Overview
-This ETL (Extract, Transform, Load) Python script automates the process of fetching cryptocurrency data from the **CoinGecko API**, cleaning and transforming it with **pandas**, storing it in a **PostgreSQL** database, and sending an automated email report (with a CSV attachment and summary tables).
-
-The pipeline is scheduled to run daily using the **schedule** library.
+This project is designed with a clean repository architecture, configurable environment variables, structured logging, and daily scheduling.
 
 ---
 
-## 🚀 Features
-- **Data Extraction:** Fetches live market data (top 250 cryptos) from the CoinGecko API.
-- **Data Transformation:** Cleans and structures the data using pandas.
-- **Data Loading:** Stores data into a PostgreSQL database, replacing daily entries dynamically.
-- **Email Automation:** Sends daily crypto market summary reports via email (in-memory CSV attachment).
-- **Scheduling:** Runs automatically every morning at 09:00.
+# 🚀 Features
+- **Modular ETL architecture** (extract, load, email, utils)
+- **Daily automated scheduling** using `schedule`
+- **Environment-driven configuration** via `.env`
+- **In-memory CSV attachment** (no local file creation)
+- **HTML formatted email report**
+- **PostgreSQL integration** with auto-DB creation
+- **Duplicate-safe daily inserts** (removes existing data for the day)
+- **Unified logging system** using your preferred messaging format (`=== message ===`)
 
 ---
 
-## ⚙️ Tech Stack & Libraries
-| Category | Libraries |
-|-----------|------------|
-| Data Extraction | `requests` |
-| Data Transformation | `pandas`, `datetime` |
-| Database Connection | `psycopg2`, `SQLAlchemy` |
-| Email Automation | `smtplib`, `email.mime`, `io` |
-| Scheduling | `schedule`, `time` |
-
----
-
-## 🧩 Script Structure
-
-### 1️⃣ Function: `send_mail()`
-Handles email composition and delivery with the following key features:
-- Sends emails through Gmail’s SMTP server.
-- Supports multiple recipients.
-- Attaches CSV file from memory (no local file storage).
-- Accepts `subject`, `body`, `filename`, and `today` parameters.
-
-**Attachment Naming:**
-Each attachment includes a timestamp, e.g.:
+# 📁 Repository Structure
 ```
-crypto_data_2025-10-29.csv
+COINGECKO_API/
+├── .env
+├── README.md
+├── requirements.txt
+├── main.py
+├── configs/
+│   ├── __init__.py
+│   └── settings.py
+├── etl/
+│   ├── __init__.py
+│   ├── extract.py
+│   ├── load.py
+│   ├── emailer.py
+│   └── utils.py
+└── logs/
+    └── etl.log
 ```
 
-**Usage:**
+---
+
+# ⚙️ Tech Stack
+| Area | Tools |
+|------|--------|
+| Extraction | `requests` |
+| Transformation | `pandas`, `datetime` |
+| DB Connection | `psycopg2`, `SQLAlchemy` |
+| Email | `smtplib`, `email.mime` |
+| Scheduling | `schedule` |
+| Config | `python-dotenv` |
+| Logging | `logging`, `RotatingFileHandler` |
+
+---
+
+# 🔧 Configuration (Environment Variables)
+All sensitive values live inside `.env`:
+```
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=yourpassword
+POSTGRES_DB=crypto_db
+
+EMAIL_SENDER=youremail@gmail.com
+EMAIL_PASSWORD=your_smtp_app_password
+EMAIL_RECEIVERS=abc@gmail.com,xyz@hotmail.com
+
+SCHEDULE_TIME=09:00
+COINGECKO_PER_PAGE=250
+COINGECKO_PAGE=1
+```
+
+---
+
+# 🧩 Module Breakdown
+
+## 1️⃣ `configs/settings.py`
+Loads configuration variables from the `.env` file.
+All modules import settings via:
+```
+from configs import settings
+```
+
+---
+
+## 2️⃣ `etl/utils.py`
+Central logging utility.
+- Creates `logs/etl.log`
+- Uses your preferred message style: `=== message ===`
+- Ensures log directory exists
+
+---
+
+## 3️⃣ `etl/extract.py`
+Handles all API extraction and transformation.
+
+### Responsibilities:
+- Fetch crypto data from CoinGecko
+- Select columns + add timestamp
+- Generate top 10 gainers & losers
+- Produce CSV file **in memory**
+- Return dictionary containing all ETL-ready components
+
+**Run manually:**
+```
+python -m etl.extract
+```
+
+---
+
+## 4️⃣ `etl/load.py`
+Handles all Postgres operations.
+
+### Responsibilities:
+- Create database if it doesn't exist
+- Connect using SQLAlchemy
+- Create `crypto_data` table (if missing)
+- Delete today's data (duplicate-safe)
+- Insert fresh daily records
+
+**Run manually:**
+```
+python -m etl.load
+```
+
+---
+
+## 5️⃣ `etl/emailer.py`
+Builds and sends an HTML email with:
+- HTML market summary
+- Top 10 gainers and losers
+- CSV attachment (in-memory)
+
+Uses Gmail SMTP by default (configurable).
+
+---
+
+# 🧠 Workflow Overview
+```
+Extract → Transform → Load → Email → Log
+```
+
+1. Pull fresh crypto data from API  
+2. Build pandas DataFrame  
+3. Delete existing rows for today  
+4. Insert new cleaned data  
+5. Generate HTML summary tables  
+6. Send email report with CSV attachment  
+7. Log entire process  
+
+---
+
+# 🕒 Scheduling
+The ETL job runs daily at the time specified in `.env`:
+```
+SCHEDULE_TIME=09:00
+```
+
+`main.py` handles scheduling:
+```
+python main.py
+```
+
+Runs indefinitely, firing your ETL once per day.
+
+To run once without scheduling:
 ```python
-send_mail(subject, body, filename, today)
+# In main.py
+run_etl()
 ```
 
 ---
 
-### 2️⃣ Function: `get_crypto_data()`
-Fetches crypto data from CoinGecko and processes it for database storage and reporting.
+# ▶️ How to Run the Entire Project
 
-**Workflow Steps:**
-1. **Extract** — Calls CoinGecko API to fetch top 250 cryptos by market cap.
-2. **Transform** — Selects key columns (`id`, `symbol`, `name`, `price`, etc.), adds timestamp.
-3. **Load** — Checks PostgreSQL for existing data for the day; deletes and replaces it with fresh data.
-4. **Email** — Generates HTML summary and sends an automated report email with top 10 gainers and losers.
+### 1. Install dependencies
+```
+pip install -r requirements.txt
+```
+
+### 2. Configure `.env`
+Update Postgres + email credentials.
+
+### 3. Run scheduled ETL service
+```
+python main.py
+```
+
+### 4. Run ETL once (manual trigger)
+```
+python -m etl.extract
+python -m etl.load
+```
+OR
+```
+python main.py  # with run_etl() uncommented
+```
 
 ---
 
-### 3️⃣ Database Logic
-- Connects to PostgreSQL using psycopg2.
-- Creates `crypto_db` database if not found.
-- Creates table `crypto_data` dynamically if not existing.
-- Deletes and replaces only today’s data (keeps historical data intact).
+# 📬 Email Report (HTML)
+The email contains:
+- Greeting
+- Daily summary description
+- **Top 10 gainers** table
+- **Top 10 losers** table
+- Professional footer
 
-**Schema Example:**
-```sql
+The HTML layout in the email is **exactly preserved** from your original script.
+
+---
+
+# 🧪 Example Table Schema
+```
 CREATE TABLE crypto_data (
     id VARCHAR(100),
     symbol VARCHAR(50),
@@ -84,104 +228,25 @@ CREATE TABLE crypto_data (
 
 ---
 
-### 4️⃣ Email Summary (HTML Body)
-The email body is built using HTML for better readability, containing:
-- A greeting header.
-- Data summary description.
-- Two formatted tables:
-  - Top 10 coins with highest price increase.
-  - Top 10 coins with largest price decrease.
-- A professional footer with author info.
-
-**Footer Example:**
-```html
-<div class="footer">
-  <p>Best regards,</p>
-  <p><strong>Oluwatosin Amosu</strong><br>
-     Senior Data Analyst<br>
-     Baby Data Engineer
-  </p>
-  <br>
-  <p>
-    <em>Tbrown's Automated Python ETL Project</em><br>
-    This is an automated email — please do not reply.<br>
-    See you tomorrow!
-  </p>
-</div>
-```
-
----
-
-### 5️⃣ Scheduling
-The task runs automatically each day at **9:00 AM** using `schedule`:
-
-```python
-schedule.every().day.at('09:00').do(get_crypto_data())
-```
-
-To run immediately (without scheduling):
-```python
-get_crypto_data()
-```
-
----
-
-## 🧠 How to Use
-
-### 🔹 1. Setup Environment
-Install dependencies:
-```bash
-pip install pandas requests psycopg2-binary SQLAlchemy schedule
-```
-
-### 🔹 2. Update PostgreSQL Credentials
-In the script, locate:
-```python
-conn = psycopg2.connect(
-    host="",
-    dbname="",
-    user="",
-    password="",
-    port=""
-)
-```
-and insert your database credentials.
-
-### 🔹 3. Update Email Details
-In the `send_mail()` function:
-- Add your Gmail credentials (`sender_mail`, `email_password`).
-- Provide recipients list:
-  ```python
-  receiver_mails = ["example1@gmail.com", "example2@yahoo.com"]
-  ```
-
-### 🔹 4. Run the ETL
-```bash
-python etl_v1_coingecko_api.py
-```
-
-You’ll see progress logs like:
-```
-=== Connection Successful!, Getting Data!... ===
-=== Succefully Connected With Postgres ===
-=== mail sent successfully! ===
-```
-
----
-
-## 🧠 Author
+# 👤 Author
 **Oluwatosin Amosu (Tbrown)**  
-*Senior Data Analyst*  
-
-💼 Automated ETL Project built in Python for daily crypto reporting.
+Senior Data Analyst & Baby Data Engineer
 
 ---
 
-### 🕒 Version
-**Script:** `etl_v1_coingecko_api.py`  
-**Version:** 1.0  
-**Date:** October 2025
+# 🗂 Versioning
+**Current Version:** 2.0  
+**Updated:** November 2025
 
 ---
 
-> 🧩 _This project automates the end-to-end cryptocurrency data reporting pipeline, integrating live API data, PostgreSQL storage, and daily email summaries._
+# 🎯 Summary
+A complete, modular, production-ready ETL pipeline integrating:
+- Live API extraction  
+- Pandas transformations  
+- PostgreSQL loading  
+- Daily email reporting  
+- Scheduling  
+- Logging  
+
+A reusable and extendable foundation for automated data engineering workflows.
