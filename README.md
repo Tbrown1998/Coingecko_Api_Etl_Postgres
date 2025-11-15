@@ -87,7 +87,7 @@ from configs import settings
 ## 2️⃣ `etl/utils.py`
 Central logging utility.
 - Creates `logs/etl.log`
-- Uses your preferred message style: `=== message ===`
+- Log style: `=== message ===`
 - Ensures log directory exists
 
 ---
@@ -206,9 +206,6 @@ The email contains:
 - **Top 10 gainers** table
 - **Top 10 losers** table
 - Professional footer
-
-The HTML layout in the email is **exactly preserved** from your original script.
-
 ---
 
 # 🧪 Example Table Schema
@@ -246,11 +243,13 @@ A complete, modular, production-ready ETL pipeline integrating:
 A reusable and extendable foundation for automated data engineering workflows.
 
 ---
----
 
 # 📫 Contact
 
 ## Oluwatosin Amosu Bolaji 
+- Data Engineer 
+- Buiness Intelligence Analyst
+- ETL Developer
 
 #### 🚀 **Always learning. Always building. Data-driven to the core.**  
 
