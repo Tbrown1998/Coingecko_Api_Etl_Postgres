@@ -1,6 +1,8 @@
-# CoinGecko Cryptocurrency ETL Pipeline
+#  CoinGecko Cryptocurrency ETL Pipeline
 
 A fully modular, production-ready ETL (Extract, Transform, Load) pipeline that pulls cryptocurrency data from the **CoinGecko API**, transforms it with **pandas**, loads it into **PostgreSQL**, and sends an automated **HTML email report** with an attached in-memory CSV file.
+
+![ETL Architecture Diagram](./coin_gecko_architecture_diagram.png)
 
 This project is designed with a clean repository architecture, configurable environment variables, structured logging, and daily scheduling.
 
@@ -14,8 +16,6 @@ This project is designed with a clean repository architecture, configurable envi
 - **HTML formatted email report**
 - **PostgreSQL integration** with auto-DB creation
 - **Duplicate-safe daily inserts** (removes existing data for the day)
-- **Unified logging system** using your preferred messaging format (`=== message ===`)
-
 ---
 
 # 📁 Repository Structure
@@ -228,12 +228,6 @@ CREATE TABLE crypto_data (
 
 ---
 
-# 👤 Author
-**Oluwatosin Amosu (Tbrown)**  
-Senior Data Analyst & Baby Data Engineer
-
----
-
 # 🗂 Versioning
 **Current Version:** 2.0  
 **Updated:** November 2025
@@ -250,3 +244,20 @@ A complete, modular, production-ready ETL pipeline integrating:
 - Logging  
 
 A reusable and extendable foundation for automated data engineering workflows.
+
+---
+---
+
+# 📫 Contact
+
+## Oluwatosin Amosu Bolaji 
+
+#### 🚀 **Always learning. Always building. Data-driven to the core.**  
+
+### 📫 **Let’s connect!**  
+- 📩 oluwabolaji60@gmail.com
+- 🔗 : [LinkedIn](https://www.linkedin.com/in/oluwatosin-amosu-722b88141)
+- 🌐 : [My Portfolio](https://www.datascienceportfol.io/oluwabolaji60) 
+- 𝕏 : [Twitter/X](https://x.com/thee_oluwatosin?s=21&t=EqoeQVdQd038wlSUzAtQzw)
+- 🔗 : [Medium](https://medium.com/@oluwabolaji60)
+- 🔗 : [View my Repositories](https://github.com/Tbrown1998?tab=repositories)
