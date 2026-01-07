@@ -2,13 +2,13 @@
 
 A fully modular, production-ready ETL (Extract, Transform, Load) pipeline that pulls cryptocurrency data from the **CoinGecko API**, transforms it with **pandas**, loads it into **PostgreSQL**, and sends an automated **HTML email report** with an attached in-memory CSV file.
 
-![ETL Architecture Diagram](./coin_gecko_architecture_diagram.png)
+![ETL Architecture](ETL.png)
 
 This project is designed with a clean repository architecture, configurable environment variables, structured logging, and daily scheduling.
 
 ---
 
-# 🚀 Features
+# Features
 - **Modular ETL architecture** (extract, load, email, utils)
 - **Daily automated scheduling** using `schedule`
 - **Environment-driven configuration** via `.env`
@@ -16,6 +16,26 @@ This project is designed with a clean repository architecture, configurable envi
 - **HTML formatted email report**
 - **PostgreSQL integration** with auto-DB creation
 - **Duplicate-safe daily inserts** (removes existing data for the day)
+---
+
+## Architecture Flow Chart
+
+```
+flowchart TD
+    A[CoinGecko API] -->|HTTP Requests| B[Extract Layer<br/>Python Script]
+
+    B --> C[Data Processing<br/>Parse JSON & Clean Data]
+
+    C --> D[Database Layer<br/>PostgreSQL]
+    D -->|Append / Replace| D1[crypto_prices_table]
+
+    D --> E[Summary Logic<br/>Python Aggregations]
+
+    E --> F[Email Service<br/>SMTP / Gmail API]
+    F --> G[Daily Summary Email]
+
+    H[Scheduler<br/>Cron / Task Scheduler] -->|Triggers| B
+```
 ---
 
 # 📁 Repository Structure
@@ -73,9 +93,9 @@ COINGECKO_PAGE=1
 
 ---
 
-# 🧩 Module Breakdown
+# Module Breakdown
 
-## 1️⃣ `configs/settings.py`
+## `configs/settings.py`
 Loads configuration variables from the `.env` file.
 All modules import settings via:
 ```
@@ -84,7 +104,7 @@ from configs import settings
 
 ---
 
-## 2️⃣ `etl/utils.py`
+## `etl/utils.py`
 Central logging utility.
 - Creates `logs/etl.log`
 - Log style: `=== message ===`
@@ -92,7 +112,7 @@ Central logging utility.
 
 ---
 
-## 3️⃣ `etl/extract.py`
+## `etl/extract.py`
 Handles all API extraction and transformation.
 
 ### Responsibilities:
@@ -109,7 +129,7 @@ python -m etl.extract
 
 ---
 
-## 4️⃣ `etl/load.py`
+## `etl/load.py`
 Handles all Postgres operations.
 
 ### Responsibilities:
@@ -126,7 +146,7 @@ python -m etl.load
 
 ---
 
-## 5️⃣ `etl/emailer.py`
+## `etl/emailer.py`
 Builds and sends an HTML email with:
 - HTML market summary
 - Top 10 gainers and losers
@@ -172,7 +192,7 @@ run_etl()
 
 ---
 
-# ▶️ How to Run the Entire Project
+# How to Run the Entire Project
 
 ### 1. Install dependencies
 ```
@@ -208,7 +228,7 @@ The email contains:
 - Professional footer
 ---
 
-# 🧪 Example Table Schema
+# Example Table Schema
 ```
 CREATE TABLE crypto_data (
     id VARCHAR(100),
@@ -231,7 +251,7 @@ CREATE TABLE crypto_data (
 
 ---
 
-# 🎯 Summary
+# Summary
 A complete, modular, production-ready ETL pipeline integrating:
 - Live API extraction  
 - Pandas transformations  
