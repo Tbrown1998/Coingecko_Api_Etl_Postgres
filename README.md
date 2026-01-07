@@ -20,7 +20,7 @@ This project is designed with a clean repository architecture, configurable envi
 
 ## Architecture Flow Chart
 
-```
+```mermaid
 flowchart TD
     A[CoinGecko API] -->|HTTP Requests| B[Extract Layer<br/>Python Script]
 
@@ -36,28 +36,6 @@ flowchart TD
 
     H[Scheduler<br/>Cron / Task Scheduler] -->|Triggers| B
 ```
----
-
-# 📁 Repository Structure
-```
-COINGECKO_API/
-├── .env
-├── README.md
-├── requirements.txt
-├── main.py
-├── configs/
-│   ├── __init__.py
-│   └── settings.py
-├── etl/
-│   ├── __init__.py
-│   ├── extract.py
-│   ├── load.py
-│   ├── emailer.py
-│   └── utils.py
-└── logs/
-    └── etl.log
-```
-
 ---
 
 # ⚙️ Tech Stack
@@ -262,6 +240,27 @@ A complete, modular, production-ready ETL pipeline integrating:
 
 A reusable and extendable foundation for automated data engineering workflows.
 
+---
+# 📁 Repository Structure
+
+```
+COINGECKO_API/
+├── .env
+├── README.md
+├── requirements.txt
+├── main.py
+├── configs/
+│   ├── __init__.py
+│   └── settings.py
+├── etl/
+│   ├── __init__.py
+│   ├── extract.py
+│   ├── load.py
+│   ├── emailer.py
+│   └── utils.py
+└── logs/
+    └── etl.log
+```
 ---
 
 # 📫 Contact
